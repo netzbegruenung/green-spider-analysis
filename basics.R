@@ -11,6 +11,8 @@ sites$generator[sites$generator == ""] <- "UNBEKANNT"
 sites_kv <- filter(sites, meta.level == "DE:KREISVERBAND")
 sites_ov <- filter(sites, meta.level == "DE:ORTSVERBAND")
 
+# die sites mit den CMS, die mind. 5 mal vorkommen
+sites_top_cms <- sites %>% group_by(generator) %>% filter(n() >= 5) %>% filter(generator != "UNBEKANNT")
 
 # Punkte
 
@@ -47,7 +49,7 @@ ggplot(sites_kv, aes(x=reorder(meta.state, -score, FUN=median), y=score)) +
 ggsave("plots/punkte_kv_nach_bundesland.png")
 
 ## Punkte nach CMS
-ggplot(sites_kv, aes(x=reorder(generator, -score, FUN=median), y=score)) +
+ggplot(sites_top_cms, aes(x=reorder(generator, -score, FUN=median), y=score)) +
   coord_flip() +
   geom_boxplot()
 ggsave("plots/punkte_nach_cms.png")
@@ -81,7 +83,7 @@ ggplot(sites, aes(x = reorder(meta.level, -rating.HTTP_RESPONSE_DURATION.value, 
   scale_y_log10() +
   coord_flip() +
   geom_boxplot() +
-  labs(title="Antwortzeiten nach Gliederungsebene (logarithmische Achse", x="Gliederung", y="Antwortzeit in Millisekunden (log.)")
+  labs(title="Antwortzeiten nach Gliederungsebene (logarithmische Achse)", x="Gliederung", y="Antwortzeit in Millisekunden (log.)")
 ggsave("plots/antwortzeiten_nach_gliederungsebene_log.png")
 
 ## Antwortzeiten nach Bundesland
@@ -89,12 +91,11 @@ ggplot(sites, aes(x = reorder(meta.state, -rating.HTTP_RESPONSE_DURATION.value, 
   scale_y_log10() +
   geom_boxplot() +
   coord_flip() +
-  labs(title="Antwortzeiten nach Bundeslande", x="Bundesland", y="Antwortzeit in Millisekunden (log.)")
+  labs(title="Antwortzeiten nach Bundesland", x="Bundesland", y="Antwortzeit in Millisekunden (log.)")
 ggsave("plots/antwortzeiten_nach_bundesland_log.png")
 
-## Antwortzeiten nach CMS (mit mind. 5 Sites)
-top_cms <- sites %>% group_by(generator) %>% filter(n() > 5) %>% filter(generator != "UNBEKANNT")
-ggplot(top_cms, aes(x = reorder(generator, -rating.HTTP_RESPONSE_DURATION.value, FUN=median), y = rating.HTTP_RESPONSE_DURATION.value)) +
+## Antwortzeiten nach CMS
+ggplot(sites_top_cms, aes(x = reorder(generator, -rating.HTTP_RESPONSE_DURATION.value, FUN=median), y = rating.HTTP_RESPONSE_DURATION.value)) +
   geom_boxplot() +
   geom_hline(yintercept = median(sites$rating.HTTP_RESPONSE_DURATION.value), colour="blue") +
   scale_y_log10() +
