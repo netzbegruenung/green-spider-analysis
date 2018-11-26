@@ -51,7 +51,8 @@ ggsave("plots/punkte_kv_nach_bundesland.png")
 ## Punkte nach CMS
 ggplot(sites_top_cms, aes(x=reorder(generator, -score, FUN=median), y=score)) +
   coord_flip() +
-  geom_boxplot()
+  geom_boxplot() +
+  labs(title="Punktzahl nach CMS", y="Punkte", x="CMS")
 ggsave("plots/punkte_nach_cms.png")
 
 # Antwortzeiten
