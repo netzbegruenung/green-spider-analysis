@@ -20,7 +20,7 @@ ggplot(sites, aes(rating.HTTP_RESPONSE_DURATION.value)) +
   labs(title="Verteilung der Antwortzeiten", x="Antwortzeit in Millisekunden (Median in blau)", y="Häufigkeit")
 ggsave("plots/antwortzeiten_verteilung_kurve.png")
 
-## Verteilung der Punkte (logarithmische X-Achse)
+## Verteilung der Antwortzeiten (logarithmische X-Achse)
 ggplot(sites, aes(rating.HTTP_RESPONSE_DURATION.value)) +
   geom_histogram() +
   scale_x_log10() +

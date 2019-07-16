@@ -2,6 +2,7 @@ library(jsonlite)
 library(dplyr)
 library(ggplot2)
 library(scales)
+library(tidyr)
 
 # Frische Daten gibt es per
 # curl https://green-spider.netzbegruenung.de/api/v1/spider-results/table/ > data/table.json
