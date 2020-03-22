@@ -1,6 +1,7 @@
 source("common.R")
 
 # Beschreibung der Punktzahl
+summary(sites)
 summary(sites$score)
 
 # Punkte
@@ -110,4 +111,75 @@ ggplot(sites_rating_criteria_long, aes(x = categories, fill = categories)) +
 
 ggplot(sites_rating_criteria_long, aes(x = categories, fill = categories)) +
   geom_bar()
+
+
+# Network Requests
+summary(sites$rating.NETWORK_REQUESTS.value)
+
+ggplot(sites, aes(rating.NETWORK_REQUESTS.value)) +
+  geom_histogram(bins = 30) +
+  xlim(0, 100) +
+  labs(title="HTTP-Anfragen: Verteilung", x="Anfragen", y="Anzahl Sites")
+ggsave("plots/network_requests_verteilung.png")
+
+# Network Payload
+summary(sites$rating.NETWORK_PAYLOAD.value / 1000)
+
+ggplot(sites, aes(rating.NETWORK_PAYLOAD.value / 1000000.0)) +
+  geom_histogram(bins = 30) +
+  xlim(0, 8) +
+  labs(title="Datentransfer: Verteilung", x="Datentransfer (MB)", y="Anzahl Sites")
+ggsave("plots/network_payload_verteilung.png")
+
+
+# Network request vs. payload
+ggplot(sites, aes(rating.NETWORK_REQUESTS.value, rating.NETWORK_PAYLOAD.value / 1000000.0)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE) +
+  xlim(0, 100) +
+  ylim(0, 8) +
+  labs(title="HTTP-Anfragen vs. Datentransfer", x="Requests", y="Payload (MB)")
+ggsave("plots/network_payload_vs_requests.png")
+
+mylm <- lm(sites$rating.NETWORK_REQUESTS.value ~ sites$rating.NETWORK_PAYLOAD.value)
+summary(mylm)
+
+# Vergleich Score und Network parameter
+ggplot(sites, aes(rating.NETWORK_REQUESTS.value, score)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "loess") +
+  xlim(0, 200) +
+  ylim(5, 16) +
+  labs(title="HTTP-Anfragen vs. Score", x="Requests", y="Score")
+ggsave("plots/network_requests_vs_score.png")
+
+lm_requests_score <- lm(sites$rating.NETWORK_REQUESTS.value ~ score)
+summary(lm_requests_score)
+
+ggplot(sites, aes(rating.NETWORK_PAYLOAD.value / 1000000.0, score)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "loess") +
+  xlim(0, 8) +
+  ylim(5, 16) +
+  labs(title="Datentransfer vs. Score", x="Datentransfer (MB)", y="Score")
+ggsave("plots/network_payload_vs_score.png")
+
+lm_requests_score <- lm(sites$rating.NETWORK_REQUESTS.value ~ score)
+summary(lm_requests_score)
+
+# Datentransfer nach CMS
+ggplot(sites_top_cms, aes(x=reorder(generator, rating.NETWORK_PAYLOAD.value, FUN=median), y=rating.NETWORK_PAYLOAD.value / 1000000.0)) +
+  coord_flip() +
+  geom_boxplot() +
+  labs(title="Datentransfer nach CMS", y="Datentransfer (MB)", x="CMS")
+ggsave("plots/network_payload_nach_cms.png")
+
+# HTTP-Anfragen nach CMS
+ggplot(sites_top_cms, aes(x=reorder(generator, rating.NETWORK_REQUESTS.value, FUN=median), y=rating.NETWORK_REQUESTS.value)) +
+  coord_flip() +
+  geom_boxplot() +
+  ylim(0, 260) +
+  labs(title="HTTP-Anfragen nach CMS", y="Anfragen", x="CMS")
+ggsave("plots/network_requests_nach_cms.png")
+
 
